@@ -1,0 +1,7 @@
+bootloader/
+build/
+modules/
+tools/
+zephyr/
+
+*.dtbo
