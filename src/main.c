@@ -20,17 +20,16 @@ bool response_complete = false;
  * Read characters from UART until line end is detected. Afterwards push the
  * data to the message queue.
  */
-void serial_cb(const struct device *dev, void *user_data)
-{
-	uint8_t c;
+void serial_cb(const struct device *dev, void *user_data) {
+  uint8_t c;
 
-	if (!uart_irq_update(uart_dev)) {
+  if (!uart_irq_update(uart_dev)) {
 		return;
 	}
 
-	if (!uart_irq_rx_ready(uart_dev)) {
-		return;
-	}
+  if (!uart_irq_rx_ready(uart_dev)) {
+    return;
+  }
   
   /* read until FIFO empty */
   while (uart_fifo_read(uart_dev, &c, 1) == 1) {
@@ -53,27 +52,20 @@ void serial_cb(const struct device *dev, void *user_data)
   }
 }
 
-void print_uart(char *buf)
-{
-    int msg_len = strlen(buf);
-    int bytes_written;
-
-    while (msg_len > 0) {
-        bytes_written = uart_fifo_fill(uart_dev, (const uint8_t *)buf, msg_len);
-
-        msg_len -= bytes_written;
-        buf += bytes_written;
-    }
+void print_uart(char *buf) {
+	int msg_len = strlen(buf);
+  for (int i = 0; i < msg_len; i++) {
+    uart_poll_out(uart_dev, buf[i]);
+  }
 }
-
 
 int main(void) {
   char tx_buf[MSG_SIZE];
 
-	if (!device_is_ready(uart_dev)) {
-		printk("UART device not found!");
-		return 0;
-	}
+  if (!device_is_ready(uart_dev)) {
+    printk("UART device not found!");
+    return 0;
+  }
 
   struct uart_config cfg = {
     .baudrate = 19200,
@@ -88,19 +80,7 @@ int main(void) {
     return 0;
   }
 
-	/* configure interrupt and callback to receive data */
-	int ret = uart_irq_callback_user_data_set(uart_dev, serial_cb, NULL);
-
-	if (ret < 0) {
-		if (ret == -ENOTSUP) {
-			printk("Interrupt-driven UART API support not enabled\n");
-		} else if (ret == -ENOSYS) {
-			printk("UART device does not support interrupt-driven API\n");
-		} else {
-			printk("Error setting UART callback: %d\n", ret);
-		}
-		return 0;
-	}
+  uart_irq_callback_user_data_set(uart_dev, serial_cb, NULL);
 	uart_irq_rx_enable(uart_dev);
 
   while (1) {
