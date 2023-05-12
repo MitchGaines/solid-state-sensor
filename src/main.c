@@ -60,13 +60,10 @@ void print_uart(char *buf) {
 }
 
 int main(void) {
-  char tx_buf[MSG_SIZE];
-
   if (!device_is_ready(uart_dev)) {
     printk("UART device not found!");
     return 0;
   }
-
   struct uart_config cfg = {
     .baudrate = 19200,
     .parity = UART_CFG_PARITY_NONE,
