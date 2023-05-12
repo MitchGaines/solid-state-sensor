@@ -78,7 +78,7 @@ int main(void) {
   }
 
   uart_irq_callback_user_data_set(uart_dev, serial_cb, NULL);
-	uart_irq_rx_enable(uart_dev);
+  uart_irq_rx_enable(uart_dev);
 
   while (1) {
     print_uart("#MOXY\r\n");
