@@ -24,8 +24,8 @@ void serial_cb(const struct device *dev, void *user_data) {
   uint8_t c;
 
   if (!uart_irq_update(uart_dev)) {
-		return;
-	}
+    return;
+  }
 
   if (!uart_irq_rx_ready(uart_dev)) {
     return;
@@ -53,7 +53,7 @@ void serial_cb(const struct device *dev, void *user_data) {
 }
 
 void print_uart(char *buf) {
-	int msg_len = strlen(buf);
+  int msg_len = strlen(buf);
   for (int i = 0; i < msg_len; i++) {
     uart_poll_out(uart_dev, buf[i]);
   }
