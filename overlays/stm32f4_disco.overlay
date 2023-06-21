@@ -1,0 +1,25 @@
+/ {
+    aliases {
+        dac-0 = &dac1;
+    };
+};
+
+&gpioa {
+    dac1_pinmux: pinmux {
+        gpio-hog;
+        gpios = <4 GPIO_ACTIVE_HIGH>;
+        output-high;
+        pa4_dac1_out: pa4_dac1_out {
+            pins = "4";
+            function = "analog";
+        };
+    };
+};
+
+&dac1 {
+    status = "okay";
+    label = "dac1";
+    pinctrl-0 = <&pa4_dac1_out>;
+    pinctrl-names = "default";
+};
+
