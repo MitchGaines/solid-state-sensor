@@ -1,5 +1,6 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
+#include <zephyr/devicetree.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/drivers/dac.h>
 
@@ -11,14 +12,14 @@
 #define MSG_SIZE 32
 
 #define DAC_DEVICE_NODE DT_NODELABEL(dac1)
-#define DAC_CHANNEL_ID 1 // Use DAC_OUT2 (PA5) as the output pin
+#define DAC_CHANNEL_ID 1 // Use DAC_OUT0 (PA4) as the output pin
 #define DAC_RESOLUTION 12 // 12-bit resolution
 
 /* queue to store up to 10 messages (aligned to 4-byte boundary) */
 K_MSGQ_DEFINE(uart_msgq, MSG_SIZE, 10, 4);
 
 static const struct device *const uart_dev = DEVICE_DT_GET(UART_DEVICE_NODE);
-static const struct device *const dac_dev = DEVICE_DT_GET(DT_LABEL(DAC_DEVICE_NODE));
+static const struct device *const dac_dev = DEVICE_DT_GET(DAC_DEVICE_NODE);
 
 static char rx_buf[MSG_SIZE];
 static int rx_buf_pos;
@@ -99,8 +100,10 @@ double po2_to_v(double po2) {
 
 int main(void) {
 
-  if (!dac_dev) {
-    printk("Cannot find %s!\n", DAC_DEVICE_NODE);
+  printk("Setting up channels...\n");
+
+  if (!device_is_ready(dac_dev)) {
+    printk("Cannot find DAC device\n");
     return 1;
   }
 
@@ -127,8 +130,9 @@ int main(void) {
     return 1;
   }
 
-  if (dac_channel_setup(dac_dev, &channel_cfg) != 0) {
-    printk("Setting up of channel %d failed!\n", DAC_CHANNEL_ID);
+  int ret = dac_channel_setup(dac_dev, &channel_cfg);
+  if (ret != 0) {
+    printk("Setting up of channel %d failed! Err: %d\n", DAC_CHANNEL_ID, ret);
     return 1;
   }
 

@@ -1,25 +1,13 @@
 / {
-    aliases {
-        dac-0 = &dac1;
-    };
-};
-
-&gpioa {
-    dac1_pinmux: pinmux {
-        gpio-hog;
-        gpios = <4 GPIO_ACTIVE_HIGH>;
-        output-high;
-        pa4_dac1_out: pa4_dac1_out {
-            pins = "4";
-            function = "analog";
+    soc {
+        dac1: dac@40007400 {
+            compatible = "st,stm32-dac";
+            reg = <0x40007400 0x400>;
+            clocks = <&rcc STM32_CLOCK_BUS_APB1 0x20000000>;
+            status = "okay";
+            pinctrl-names = "default";
+            pinctrl-0 = <&dac_out1_pa4>;
         };
     };
-};
-
-&dac1 {
-    status = "okay";
-    label = "dac1";
-    pinctrl-0 = <&pa4_dac1_out>;
-    pinctrl-names = "default";
 };
 
